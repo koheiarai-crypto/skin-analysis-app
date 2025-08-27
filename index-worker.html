@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI肌診断システム - Vital Grace Fit</title>
+    <meta name="description" content="OpenAI GPT-4o搭載の本格肌診断システム。11項目の詳細分析で肌の状態をチェックできます。">
+    <meta name="keywords" content="肌診断,肌分析,AI,OpenAI,GPT-4o,美容,スキンケア,Vital Grace Fit">
+    <meta property="og:title" content="AI肌診断システム - Vital Grace Fit">
+    <meta property="og:description" content="OpenAI GPT-4o搭載の本格肌診断システム">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://skin.vitalgracefit.com">
+    <link rel="canonical" href="https://skin.vitalgracefit.com">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .status {
+            color: #4ade80;
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .endpoint {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo h1 {
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #4ade80, #22c55e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .logo p {
+            font-size: 1.2em;
+            margin: 10px 0;
+            opacity: 0.9;
+        }
+        .test-form {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 30px 0;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+        }
+        .test-form h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #4ade80;
+        }
+        .test-form input[type="file"] {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+        }
+        .test-form input[type="file"]::file-selector-button {
+            background: #4ade80;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+        .test-form button {
+            background: linear-gradient(45deg, #4ade80, #22c55e);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 15px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(74, 222, 128, 0.3);
+        }
+        .test-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 222, 128, 0.4);
+        }
+        .test-form button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .result {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 30px 0;
+            display: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .result h3 {
+            color: #4ade80;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .result h4 {
+            color: #4ade80;
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+        .result h5 {
+            color: #4ade80;
+            margin: 20px 0 15px 0;
+        }
+        .result ul {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        .result li {
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .result li:last-child {
+            border-bottom: none;
+        }
+        .domain-info {
+            background: linear-gradient(45deg, #4ade80, #22c55e);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 25px 0;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(74, 222, 128, 0.3);
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        .loading {
+            text-align: center;
+            margin: 20px 0;
+            display: none;
+        }
+        .loading .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #4ade80;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none;
+        }
+        .success-info {
+            background: rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            text-align: center;
+        }
+        .camera-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+        .camera-section button {
+            background: #4ade80;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        .camera-section video {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        .camera-section canvas {
+            display: none;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            .logo h1 {
+                font-size: 2.5em;
+            }
+            .test-form {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>AI肌診断システム</h1>
+            <p>OpenAI GPT-4o搭載</p>
+        </div>
+        
+        <p class="status">誰でも使える！写真を撮るだけで肌診断</p>
+        
+        <div class="success-info">
+            <h3>Cloudflare Workers対応</h3>
+            <p>APIキー入力不要！どこからでもアクセス可能</p>
+            <p>写真を撮るだけで本格的なAI分析！</p>
+        </div>
+        
+        <div class="domain-info">
+            <h2>ドメイン: skin.vitalgracefit.com</h2>
+            <p>本格的なAI分析で肌の状態をチェック</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>AI分析</h3>
+                <p>GPT-4oで高精度分析</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>11項目分析</h3>
+                <p>詳細な肌の状態チェック</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3>セキュア</h3>
+                <p>Cloudflare Workersで安全処理</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌐</div>
+                <h3>どこからでも</h3>
+                <p>端末回線を問わず使用</p>
+            </div>
+        </div>
+        
+        <div class="camera-section">
+            <h3>📸 カメラで写真撮影</h3>
+            <p>カメラを起動して肌の写真を撮影してください</p>
+            <button id="startCamera">カメラを起動</button>
+            <button id="capturePhoto" style="display: none;">写真を撮影</button>
+            <button id="retakePhoto" style="display: none;">撮り直し</button>
+            <div id="cameraContainer">
+                <video id="video" autoplay playsinline></video>
+                <canvas id="canvas"></canvas>
+            </div>
+        </div>
+        
+        <div class="endpoint">
+            <h2>利用可能な機能</h2>
+            <p><strong>AI肌分析:</strong> GPT-4oによる11項目の詳細分析</p>
+            <p><strong>総合評価:</strong> 100点満点での採点</p>
+            <p><strong>個別分析:</strong> しみ、しわ、ほうれい線、べたつき、うるおい、ハリ、透明感、毛穴、くすみ、きめ、くま</p>
+            <p><strong>推奨事項:</strong> AIによる個別の改善提案</p>
+        </div>
+        
+        <div class="test-form">
+            <h2>AI肌分析テスト</h2>
+            <form id="skinForm">
+                <input type="file" id="imageFile" accept="image/*" required>
+                <button type="submit" id="analyzeBtn">AIで肌を分析する</button>
+            </form>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>AIが画像を分析中です...</p>
+            <p><small>数秒〜数十秒かかる場合があります</small></p>
+        </div>
+        
+        <div class="error" id="error"></div>
+        
+        <div class="result" id="result">
+            <h3>AI分析結果</h3>
+            <div id="resultContent"></div>
+        </div>
+        
+        <div class="endpoint">
+            <h2>使用方法</h2>
+            <p>このシステムはOpenAI GPT-4o搭載の本格的な肌診断システムです。</p>
+            <p>カメラで写真を撮影するか、画像ファイルをアップロードすると、AIが実際の肌の状態を分析します。</p>
+            <p><strong>本番ドメイン:</strong> skin.vitalgracefit.com</p>
+            <p><strong>特徴:</strong> 最新モデル対応、どこからでも使用可能、APIキー入力不要</p>
+        </div>
+    </div>
+
+    <script>
+        let stream = null;
+        let capturedImage = null;
+        let workerUrl = 'https://skin-analysis.kohei-arai-8d1.workers.dev'; // Cloudflare WorkersのURL
+
+        // カメラ起動
+        document.getElementById('startCamera').addEventListener('click', async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'user',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    } 
+                });
+                
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+                
+                document.getElementById('startCamera').style.display = 'none';
+                document.getElementById('capturePhoto').style.display = 'inline-block';
+                document.getElementById('retakePhoto').style.display = 'none';
+                
+            } catch (error) {
+                console.error('カメラ起動エラー:', error);
+                showError('カメラを起動できませんでした。ファイルアップロードをお試しください。');
+            }
+        });
+
+        // 写真撮影
+        document.getElementById('capturePhoto').addEventListener('click', () => {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+            
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0);
+            
+            // 画像をBlobに変換
+            canvas.toBlob((blob) => {
+                capturedImage = blob;
+                
+                // カメラを停止
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    stream = null;
+                }
+                
+                document.getElementById('capturePhoto').style.display = 'none';
+                document.getElementById('retakePhoto').style.display = 'inline-block';
+                document.getElementById('startCamera').style.display = 'inline-block';
+                
+                // 自動で分析開始
+                analyzeSkinWithAI(capturedImage);
+            }, 'image/jpeg', 0.8);
+        });
+
+        // 撮り直し
+        document.getElementById('retakePhoto').addEventListener('click', () => {
+            capturedImage = null;
+            document.getElementById('retakePhoto').style.display = 'none';
+            document.getElementById('startCamera').style.display = 'inline-block';
+        });
+
+        // ファイルアップロードでの分析
+        document.getElementById('skinForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('imageFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showError('画像ファイルを選択してください');
+                return;
+            }
+            
+            if (file.size > 20 * 1024 * 1024) {
+                showError('ファイルサイズが大きすぎます。20MB以下の画像を選択してください。');
+                return;
+            }
+            
+            await analyzeSkinWithAI(file);
+        });
+
+        async function analyzeSkinWithAI(imageFile) {
+            try {
+                showLoading(true);
+                hideError();
+                hideResult();
+                
+                // FormDataを作成
+                const formData = new FormData();
+                formData.append('image', imageFile);
+                
+                // Cloudflare Workersを呼び出し
+                const response = await fetch(workerUrl, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || '分析中にエラーが発生しました');
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayResult(data.analysis);
+                } else {
+                    throw new Error(data.error || '分析に失敗しました');
+                }
+                
+            } catch (error) {
+                console.error('分析エラー:', error);
+                showError('分析中にエラーが発生しました: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function displayResult(analysis) {
+            const resultDiv = document.getElementById('result');
+            const contentDiv = document.getElementById('resultContent');
+            
+            let html = `<h4>総合評価: ${analysis.overall_score}点</h4>`;
+            
+            html += '<h5>AI詳細分析:</h5><ul>';
+            Object.entries(analysis.features).forEach(([key, feature]) => {
+                const featureNames = {
+                    shimi: 'しみ',
+                    shiwa: 'しわ',
+                    houreisen: 'ほうれい線',
+                    betatsuki: 'べたつき',
+                    uruoi: 'うるおい',
+                    hari: 'ハリ',
+                    toumeikan: '透明感',
+                    keana: '毛穴',
+                    kusumi: 'くすみ',
+                    kime: 'きめ',
+                    kuma: 'くま'
+                };
+                html += `<li><strong>${featureNames[key]}:</strong> ${feature.score}点 - ${feature.description}</li>`;
+            });
+            html += '</ul>';
+            
+            if (analysis.strengths && analysis.strengths.length > 0) {
+                html += '<h5>長所:</h5><ul>';
+                analysis.strengths.forEach(strength => {
+                    html += `<li>${strength}</li>`;
+                });
+                html += '</ul>';
+            }
+            
+            if (analysis.weaknesses && analysis.weaknesses.length > 0) {
+                html += '<h5>短所:</h5><ul>';
+                analysis.weaknesses.forEach(weakness => {
+                    html += `<li>${weakness}</li>`;
+                });
+                html += '</ul>';
+            }
+            
+            if (analysis.recommendations && analysis.recommendations.length > 0) {
+                html += '<h5>AI推奨事項:</h5><ul>';
+                analysis.recommendations.forEach(recommendation => {
+                    html += `<li>${recommendation}</li>`;
+                });
+                html += '</ul>';
+            }
+            
+            contentDiv.innerHTML = html;
+            resultDiv.style.display = 'block';
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+            document.getElementById('analyzeBtn').disabled = show;
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('error').style.display = 'none';
+        }
+
+        function hideResult() {
+            document.getElementById('result').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
